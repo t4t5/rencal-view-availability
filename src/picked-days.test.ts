@@ -1,0 +1,84 @@
+import { Temporal } from "@rencomputer/rencal-sdk"
+import { describe, expect, it } from "vitest"
+
+import {
+  addRange,
+  nextDate,
+  nextRange,
+  offeredSpans,
+  type PickedDay,
+  rangeFrom,
+  removeDay,
+  removeRange,
+  setRange,
+} from "./picked-days"
+
+const MON = Temporal.PlainDate.from("2026-11-09")
+const TUE = Temporal.PlainDate.from("2026-11-10")
+const range = (start: number, end: number) => ({ startMinutes: start * 60, endMinutes: end * 60 })
+const monday: PickedDay = { date: MON, ranges: [range(9, 12)] }
+
+describe("addRange", () => {
+  it("adds new dates in date order", () => {
+    const days = addRange(addRange([], TUE, range(9, 10)), MON, range(9, 10))
+    expect(days.map((day) => day.date.toString())).toEqual(["2026-11-09", "2026-11-10"])
+  })
+
+  it("joins ranges that overlap or touch", () => {
+    expect(addRange([monday], MON, range(12, 13))[0].ranges).toEqual([range(9, 13)])
+    expect(addRange([monday], MON, range(14, 15))[0].ranges).toEqual([range(9, 12), range(14, 15)])
+  })
+})
+
+it("joins ranges an edit pushes together, keeping them in order", () => {
+  const days = addRange([monday], MON, range(14, 15))
+  expect(setRange(days, MON, 1, range(11, 15))[0].ranges).toEqual([range(9, 15)])
+  expect(setRange(days, MON, 0, range(16, 17))[0].ranges).toEqual([range(14, 15), range(16, 17)])
+})
+
+it("removes one range and leaves the date", () => {
+  const days = addRange([monday], MON, range(14, 15))
+  expect(removeRange(days, MON, 0)[0].ranges).toEqual([range(14, 15)])
+})
+
+it("removes a whole date", () => {
+  const days = addRange([monday], TUE, range(9, 10))
+  expect(removeDay(days, MON).map((day) => day.date.toString())).toEqual(["2026-11-10"])
+})
+
+describe("nextDate", () => {
+  it("starts today", () => {
+    expect(nextDate([], MON)).toEqual(MON)
+  })
+
+  it("follows the last date", () => {
+    expect(nextDate([monday], MON)).toEqual(TUE)
+  })
+
+  it("doesn't offer a day that's already gone", () => {
+    expect(nextDate([monday], MON.add({ days: 5 }))).toEqual(MON.add({ days: 5 }))
+  })
+})
+
+describe("rangeFrom", () => {
+  it("stops at midnight", () => {
+    expect(rangeFrom(23 * 60 + 45, 30)).toEqual({ startMinutes: 1425, endMinutes: 1440 })
+  })
+})
+
+describe("nextRange", () => {
+  it("leaves an hour after the last range", () => {
+    expect(nextRange([range(9, 12)], 30)).toEqual({ startMinutes: 780, endMinutes: 810 })
+  })
+
+  it("gives up when the day has no room", () => {
+    expect(nextRange([range(22, 23)], 30)).toBeNull()
+  })
+})
+
+describe("offeredSpans", () => {
+  it("runs a range ending at midnight into the next day", () => {
+    const [span] = offeredSpans(addRange([], MON, range(23, 24)), "UTC")
+    expect(span.end.equals(Temporal.Instant.from("2026-11-10T00:00:00Z"))).toBe(true)
+  })
+})

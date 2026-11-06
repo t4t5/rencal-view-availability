@@ -1,0 +1,48 @@
+import {
+  formatWallclockTime,
+  type TimeFormat,
+  useDisplaySettings,
+} from "@rencomputer/rencal-sdk"
+
+import { TIME_STEP_MINUTES } from "./picked-days"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select"
+
+function formatMinutes(minutes: number, timeFormat: TimeFormat): string {
+  const hour = Math.floor(minutes / 60)
+  // Midnight as an end time: "24:00", or "12:00 AM".
+  return formatWallclockTime(timeFormat === "12h" ? hour % 24 : hour, minutes % 60, timeFormat)
+}
+
+/** Minutes past midnight in 15-minute steps, from `min` to `max` inclusive. */
+export function TimeSelect({
+  value,
+  min,
+  max,
+  onChange,
+}: {
+  value: number
+  min: number
+  max: number
+  onChange: (minutes: number) => void
+}) {
+  const { timeFormat } = useDisplaySettings()
+  const options = Array.from(
+    { length: Math.floor((max - min) / TIME_STEP_MINUTES) + 1 },
+    (_, i) => min + i * TIME_STEP_MINUTES,
+  )
+
+  return (
+    <Select value={String(value)} onValueChange={(next) => onChange(Number(next))}>
+      <SelectTrigger className="w-[5.5rem] tabular-nums">
+        <SelectValue />
+      </SelectTrigger>
+      <SelectContent className="max-h-64">
+        {options.map((minutes) => (
+          <SelectItem key={minutes} value={String(minutes)} className="tabular-nums">
+            {formatMinutes(minutes, timeFormat)}
+          </SelectItem>
+        ))}
+      </SelectContent>
+    </Select>
+  )
+}

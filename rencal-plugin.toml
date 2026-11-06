@@ -1,0 +1,10 @@
+id = "t4t5.availability"
+name = "Availability"
+description = "Pick times on a week grid and get a message offering them, ready to paste."
+min_rencal_version = "0.9.1"
+
+[[contributes.views]]
+id = "availability"
+name = "Availability"
+script = "dist/availability.js"
+css = "dist/availability.css"

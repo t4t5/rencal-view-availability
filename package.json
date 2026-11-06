@@ -1,0 +1,26 @@
+{
+  "name": "rencal-view-availability",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "rencal-sdk build",
+    "dev": "rencal-sdk dev",
+    "test": "vitest run"
+  },
+  "devDependencies": {
+    "@js-temporal/polyfill": "^0.5.1",
+    "@rencomputer/rencal-sdk": "0.3.0",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "happy-dom": "^21.0.4",
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1",
+    "vitest": "^5.1.0"
+  },
+  "dependencies": {
+    "@radix-ui/react-dropdown-menu": "^2.2.1",
+    "@radix-ui/react-popover": "^1.3.1",
+    "@radix-ui/react-select": "^2.4.1",
+    "cmdk": "^1.1.1"
+  }
+}
