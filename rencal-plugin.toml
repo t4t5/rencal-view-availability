@@ -1,6 +1,6 @@
 id = "t4t5.availability"
 name = "Availability"
-description = "Pick times on a week grid and get a message offering them, ready to paste."
+description = "Pick available times and copy a ready-to-send message."
 min_rencal_version = "0.9.1"
 
 [[contributes.views]]
