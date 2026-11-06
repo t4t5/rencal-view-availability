@@ -2,6 +2,8 @@
 
 A [renCal](https://rencal.org) view for offering someone times to meet. Pick times on a week grid and get a message ready to paste, in their timezone.
 
+![Availability view in renCal](preview.png)
+
 - **Grid:** your week with events dimmed behind it. Drag on a day to pick a time; everything you haven't picked stays hatched.
 - **Panel:** edit the picked times, add days, set the meeting length and the recipient's timezone.
 - **Message:** click it to copy.
